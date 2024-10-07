@@ -67,23 +67,6 @@ def max_word_value(words):
     """Calc the max value of a collection of words"""
     return max(words, key=calculate_word_value)
 
-def display_menu():
-    print("(1) Syötä sana")
-    print("(2) Vaihda kirjaimia")
-    print("(3) Lue ohjeet")
-    print("(4) Lopeta")
-
-    choice = None
-    while True:
-        try:
-            choice = int(input("Syötä valinta (1-4): "))
-            if choice in [1, 2, 3, 4]:
-                return choice
-            else:
-                print("Virheellinen syöte, yritä uudelleen.")
-        except ValueError:
-            print("Virheellinen syöte, yritä uudelleen.")
-
 def display_start_menu():
     print("\n--- Scrabble ---")
     print("(1) Aloita uusi peli")
@@ -95,6 +78,23 @@ def display_start_menu():
         try:
             choice = int(input("Syötä valinta (1-3): "))
             if choice in [1, 2, 3]:
+                return choice
+            else:
+                print("Virheellinen syöte, yritä uudelleen.")
+        except ValueError:
+            print("Virheellinen syöte, yritä uudelleen.")
+
+def display_menu():
+    print("(1) Syötä sana")
+    print("(2) Vaihda kirjaimia")
+    print("(3) Lue ohjeet")
+    print("(4) Lopeta")
+
+    choice = None
+    while True:
+        try:
+            choice = int(input("Syötä valinta (1-4): "))
+            if choice in [1, 2, 3, 4]:
                 return choice
             else:
                 print("Virheellinen syöte, yritä uudelleen.")
@@ -116,8 +116,21 @@ def display_end_menu():
         except ValueError:
             print("Virheellinen syöte, yritä uudelleen.")
 
+def display_manual():
+    print("Tervetuloa Scrabbleen.\n\n")
+    print("Sinulla on käytettävissä 7 kirjainta. Tehtävänäsi on keksiä niistä")
+    print("mahdollisimman arvokas sana. Harvinaisemmat kirjaimet ja pitkät sanat")
+    print("antavat parhaan mahdollisuuden tähän. Halutessasi, voit myös vaihtaa")
+    print("kirjaimia. Tällöin saat määrittää, mitkä kirjaimet haluat vaihtaa. Sitten")
+    print("pussukasta nostetaan niin monta uutta kirjainta, ja vanhat kirjaimet")
+    print("palautetaan pussukkaan. Kun olet keksinyt mielestäsi hyvän sanan, voit")
+    print("valita sen syöttämisen. Sana tarkistetaan, ja jos se löytyy sanakirjasta,")
+    print("pistemäärä kerrotaan. Halutessasi voit myös saada tietoosi, mikä olisi")
+    print("ollut arvokkain mahdollinen sana niistä kirjaimista, mitä sinulla oli käytössäsi.")
+
 def main():
     game_state = "not_started"  # Initialize the game state
+    draw = None
 
     while True:
         if game_state == "not_started":
@@ -127,7 +140,9 @@ def main():
                     draw = draw_letters()
                     print(f"Nostetut kirjaimet: {', '.join(draw)}")
                     game_state = "in_progress"  # Change the state to in progress
-                case 4:
+                case 2:
+                    display_manual()
+                case 3:
                     print("Kiitos pelistä!")
                     sys.exit()
                 case _:
@@ -135,6 +150,8 @@ def main():
 
         if game_state == "in_progress":
             choice = display_menu()
+            print(f"Käytössäsi olevat kirjaimet: {', '.join(draw)}")
+
             match choice:
                 case 1:
                     word = input_word(draw)
@@ -157,7 +174,7 @@ def main():
                 case 2:
                     pass
                 case 3:
-                    pass
+                    display_manual()
                 case 4:
                     print("Kiitos pelistä!")
                     sys.exit()
