@@ -1,7 +1,7 @@
 import csv
-from collections import namidtuple
+from collections import namedtuple
 
-Letter = namidtuple('Letter', 'name amount value')
+Letter = namedtuple('Letter', 'name amount value')
 
 
 def load_words():
