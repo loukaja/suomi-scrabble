@@ -1,6 +1,8 @@
 import csv
 from collections import namedtuple
 
+from pouch import Pouch
+
 Letter = namedtuple('Letter', 'name amount value')
 
 
@@ -47,10 +49,7 @@ distribution = [
     Letter(name='Ö', amount='1', value='7')
 ]
 
-POUCH = list(''.join(
-        list(Letter.name * int(Letter.amount)
-            for Letter in distribution))
-    )
+pouch = Pouch(distribution)
 
 LETTER_SCORES = dict(zip(
         [letter.name for letter in distribution],

@@ -1,21 +1,23 @@
 import itertools
-import random
+import sys
 from collections import Counter
 
-from data import DICTIONARY, LETTER_SCORES, POUCH
+from data import DICTIONARY, LETTER_SCORES, pouch
 
 NUM_LETTERS = 7
 
 def draw_letters():
-    return random.sample(POUCH, NUM_LETTERS)
+    return pouch.draw(NUM_LETTERS)
 
 def input_word(draw):
     word = None
 
-    while not _validation(word, draw):
-        word = input("Syötä sana: ")
-
-    return word
+    while True:
+        word = input("Syötä sana (tai '0' palataksesi valikkoon): ")
+        if word == "0":  # Check if the user wants to go back
+            return None  # Returning None to signal going back
+        if _validation(word, draw):
+            return word
 
 def _validation(word, draw):
     if word is None:
@@ -58,29 +60,120 @@ def _get_permutations_draw(draw):
 
     return permutations
 
+def remaining_letters():
+    return pouch.remaining_letters()
+
 def max_word_value(words):
     """Calc the max value of a collection of words"""
     return max(words, key=calculate_word_value)
 
+def display_menu():
+    print("(1) Syötä sana")
+    print("(2) Vaihda kirjaimia")
+    print("(3) Lue ohjeet")
+    print("(4) Lopeta")
+
+    choice = None
+    while True:
+        try:
+            choice = int(input("Syötä valinta (1-4): "))
+            if choice in [1, 2, 3, 4]:
+                return choice
+            else:
+                print("Virheellinen syöte, yritä uudelleen.")
+        except ValueError:
+            print("Virheellinen syöte, yritä uudelleen.")
+
+def display_start_menu():
+    print("\n--- Scrabble ---")
+    print("(1) Aloita uusi peli")
+    print("(2) Lue ohjeet")
+    print("(3) Lopeta")
+
+    choice = None
+    while True:
+        try:
+            choice = int(input("Syötä valinta (1-3): "))
+            if choice in [1, 2, 3]:
+                return choice
+            else:
+                print("Virheellinen syöte, yritä uudelleen.")
+        except ValueError:
+            print("Virheellinen syöte, yritä uudelleen.")
+
+def display_end_menu():
+    print("(1) Uusi peli")
+    print("(2) Lopeta")
+
+    choice = None
+    while True:
+        try:
+            choice = int(input("Syötä valinta (1-3): "))
+            if choice in [1, 2, 3]:
+                return choice
+            else:
+                print("Virheellinen syöte, yritä uudelleen.")
+        except ValueError:
+            print("Virheellinen syöte, yritä uudelleen.")
+
 def main():
-    draw = draw_letters()
-    print("Nostetut kirjaimet: {}".format(', '.join(draw)))
+    game_state = "not_started"  # Initialize the game state
 
-    word = input_word(draw)
-    word_value = calculate_word_value(word)
-    print(f"Syötit sanan: {word}, sen arvo on: {word_value}")
+    while True:
+        if game_state == "not_started":
+            choice = display_start_menu()
+            match choice:
+                case 1:
+                    draw = draw_letters()
+                    print(f"Nostetut kirjaimet: {', '.join(draw)}")
+                    game_state = "in_progress"  # Change the state to in progress
+                case 4:
+                    print("Kiitos pelistä!")
+                    sys.exit()
+                case _:
+                    print("Virheellinen valinta.")
 
-    print_max_word = input("Haluatko nähdä optimaalisen sanan (k/e)?")
-    if print_max_word.lower() == 'k':
-        possible_words = get_possible_dict_words(draw)
+        if game_state == "in_progress":
+            choice = display_menu()
+            match choice:
+                case 1:
+                    word = input_word(draw)
+                    if word is None:  # If the player chose to go back to the menu
+                        continue  # Skip the rest and display the menu again
+                    word_value = calculate_word_value(word)
+                    print(f"Syötit sanan: {word}, sen arvo on: {word_value}")
+                    print_max_word = input("Haluatko nähdä optimaalisen sanan (k/e)?")
+                    if print_max_word.lower() == 'k':
+                        possible_words = get_possible_dict_words(draw)
 
-        max_word = max_word_value(possible_words)
-        max_word_score = calculate_word_value(max_word)
-        if max_word_score == word_value:
-            print("Onnistuit jo löytämään optimaalisen sanan, onnittelut!")
-        else:
-            print(f"Optimaalinen sana olisi ollut {max_word}, jonka pistearvo on {max_word_score}.")
+                        max_word = max_word_value(possible_words)
+                        max_word_score = calculate_word_value(max_word)
+                        if max_word_score == word_value:
+                            print("Onnistuit jo löytämään optimaalisen sanan, onnittelut!")
+                        else:
+                            print(f"Optimaalinen sana olisi ollut {max_word}, jonka pistearvo on {max_word_score}.")
 
+                        game_state = "ended"
+                case 2:
+                    pass
+                case 3:
+                    pass
+                case 4:
+                    print("Kiitos pelistä!")
+                    sys.exit()
+                case _:
+                    print("Virheellinen valinta")
+
+        if game_state == "ended":
+            choice = display_end_menu()
+
+            match choice:
+                case 1:
+                    print("Aloitetaan uusi peli!")
+                    game_state = "not_started"
+                case 2:
+                    print("Kiitos pelistä!")
+                    sys.exit()
 
 if __name__ == "__main__":
     main()
