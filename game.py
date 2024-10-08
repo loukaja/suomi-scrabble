@@ -4,10 +4,8 @@ from collections import Counter
 
 from data import DICTIONARY, LETTER_SCORES, pouch
 
-NUM_LETTERS = 7
-
-def draw_letters():
-    return pouch.draw(NUM_LETTERS)
+def draw_letters(num_letters):
+    return pouch.draw(num_letters)
 
 def input_word(draw):
     word = None
@@ -66,6 +64,31 @@ def remaining_letters():
 def max_word_value(words):
     """Calc the max value of a collection of words"""
     return max(words, key=calculate_word_value)
+
+def change_letters(to_be_changed, draw):
+    to_be_changed = to_be_changed.upper()
+
+    # First, validate the letters to be changed are in the player's draw
+    for letter in to_be_changed:
+        if letter not in draw:
+            print(f"Virheellinen valinta: '{letter}' ei ole käytettävissä olevien kirjainten joukossa.")
+            return draw
+    
+    new_letters = pouch.draw(len(to_be_changed))
+
+    # Remove old letters from the player's hand
+    for letter in to_be_changed:
+        draw.remove(letter)
+    
+    draw.extend(new_letters)
+
+    # Return the old letters to the pouch
+    pouch.return_letters(to_be_changed)
+
+    print(f"Uudet nostetut kirjaimet: {', '.join(new_letters)}")
+    print(f"Uudet käytettävissä olevat kirjaimet: {', '.join(draw)}")
+
+    return draw
 
 def display_start_menu():
     print("\n--- Scrabble ---")
@@ -129,7 +152,7 @@ def display_manual():
     print("ollut arvokkain mahdollinen sana niistä kirjaimista, mitä sinulla oli käytössäsi.")
 
 def main():
-    game_state = "not_started"  # Initialize the game state
+    game_state = "not_started" 
     draw = None
 
     while True:
@@ -137,9 +160,9 @@ def main():
             choice = display_start_menu()
             match choice:
                 case 1:
-                    draw = draw_letters()
+                    draw = draw_letters(7)
                     print(f"Nostetut kirjaimet: {', '.join(draw)}")
-                    game_state = "in_progress"  # Change the state to in progress
+                    game_state = "in_progress"
                 case 2:
                     display_manual()
                 case 3:
@@ -155,8 +178,8 @@ def main():
             match choice:
                 case 1:
                     word = input_word(draw)
-                    if word is None:  # If the player chose to go back to the menu
-                        continue  # Skip the rest and display the menu again
+                    if word is None:
+                        continue
                     word_value = calculate_word_value(word)
                     print(f"Syötit sanan: {word}, sen arvo on: {word_value}")
                     print_max_word = input("Haluatko nähdä optimaalisen sanan (k/e)?")
@@ -172,7 +195,8 @@ def main():
 
                         game_state = "ended"
                 case 2:
-                    pass
+                    to_be_changed = input("Syötä vaihdettavat kirjaimet ilman välejä (esim 'abcd'): ")
+                    draw = change_letters(to_be_changed, draw)
                 case 3:
                     display_manual()
                 case 4:
