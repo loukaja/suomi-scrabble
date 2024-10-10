@@ -73,13 +73,13 @@ def change_letters(to_be_changed, draw):
         if letter not in draw:
             print(f"Virheellinen valinta: '{letter}' ei ole käytettävissä olevien kirjainten joukossa.")
             return draw
-    
+
     new_letters = pouch.draw(len(to_be_changed))
 
     # Remove old letters from the player's hand
     for letter in to_be_changed:
         draw.remove(letter)
-    
+
     draw.extend(new_letters)
 
     # Return the old letters to the pouch
@@ -125,13 +125,13 @@ def display_menu():
             print("Virheellinen syöte, yritä uudelleen.")
 
 def display_end_menu():
-    print("(1) Uusi peli")
+    print("(1) Palaa alkuvalikkoon")
     print("(2) Lopeta")
 
     choice = None
     while True:
         try:
-            choice = int(input("Syötä valinta (1-3): "))
+            choice = int(input("Syötä valinta (1-2): "))
             if choice in [1, 2, 3]:
                 return choice
             else:
@@ -152,7 +152,7 @@ def display_manual():
     print("ollut arvokkain mahdollinen sana niistä kirjaimista, mitä sinulla oli käytössäsi.")
 
 def main():
-    game_state = "not_started" 
+    game_state = "not_started"
     draw = None
 
     while True:
@@ -161,7 +161,7 @@ def main():
             match choice:
                 case 1:
                     draw = draw_letters(7)
-                    print(f"Nostetut kirjaimet: {', '.join(draw)}")
+                    print(f"Nostetut kirjaimet: {pouch.format_letters(draw)}")
                     game_state = "in_progress"
                 case 2:
                     display_manual()
@@ -173,7 +173,7 @@ def main():
 
         if game_state == "in_progress":
             choice = display_menu()
-            print(f"Käytössäsi olevat kirjaimet: {', '.join(draw)}")
+            print(f"Käytössäsi olevat kirjaimet: {pouch.format_letters(draw)}")
 
             match choice:
                 case 1:
